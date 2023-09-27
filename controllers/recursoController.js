@@ -1,8 +1,9 @@
+const mongoose = require("mongoose");
 const Recurso = require("../models/recurso");
 const { request, response } = require("express");
 
+//$ POST - Crear genero
 const createRecurso = async (req = request, res = response) => {
-  // Destructurar los elementos a enviar
   const {
     serial,
     titulo,
@@ -17,13 +18,14 @@ const createRecurso = async (req = request, res = response) => {
   } = req.body;
 
   try {
-    const recursoDB = await Recurso.findOne({ serial });
+    const existingRecurso = await Recurso.findOne({ serial });
 
-    if (recursoDB) {
-      return res.status(400).json({ msj: `El recurso ${titulo} ya existe` });
+    if (existingRecurso) {
+      return res
+        .status(400)
+        .json({ msj: `El recurso con serial ${serial} ya existe` });
     }
 
-    // Crear un nuevo objeto recurso
     const recurso = new Recurso({
       serial,
       titulo,
@@ -31,21 +33,130 @@ const createRecurso = async (req = request, res = response) => {
       url,
       portada,
       anioEstreno,
-      genero: genero,
-      director: director,
-      productora: productora,
-      tipo: tipo,
+      genero,
+      director,
+      productora,
+      tipo,
     });
 
-    console.log(req.body);
-    // Se guardan los datos en recurso
     await recurso.save();
 
     return res.status(201).json(recurso);
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ msj: error });
+    return res.status(500).json({ msj: error.message });
   }
 };
 
-module.exports = { createRecurso };
+//$ GET, Consultar todos los generos
+const getRecursos = async (req = request, res = response) => {
+  try {
+    const recursos = await Recurso.find();
+
+    return res.status(200).json(recursos);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ msj: error.message });
+  }
+};
+
+//$ GET - Consultar genero por ObjectID
+const getRecursoByID = async (req = request, res = response) => {
+  const { id } = req.params;
+
+  try {
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ msj: "ID no válido" });
+    }
+
+    const recurso = await Recurso.findById(id);
+
+    if (!recurso) {
+      return res.status(404).json({ msj: "Recurso no encontrado" });
+    }
+
+    return res.status(200).json(recurso);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ msj: error.message });
+  }
+};
+
+//$ PUT - Actualizar genero
+const updateRecurso = async (req = request, res = response) => {
+  const { id } = req.params;
+  const {
+    serial,
+    titulo,
+    sinopsis,
+    url,
+    portada,
+    anioEstreno,
+    genero,
+    director,
+    productora,
+    tipo,
+  } = req.body;
+
+  try {
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ msj: "ID no válido" });
+    }
+
+    const recurso = await Recurso.findById(id);
+
+    if (!recurso) {
+      return res.status(404).json({ msj: "Recurso no encontrado" });
+    }
+
+    recurso.fechaModificacion = new Date();
+    recurso.serial = serial || recurso.serial;
+    recurso.titulo = titulo || recurso.titulo;
+    recurso.sinopsis = sinopsis || recurso.sinopsis;
+    recurso.url = url || recurso.url;
+    recurso.portada = portada || recurso.portada;
+    recurso.anioEstreno = anioEstreno || recurso.anioEstreno;
+    recurso.genero = genero || recurso.genero;
+    recurso.director = director || recurso.director;
+    recurso.productora = productora || recurso.productora;
+    recurso.tipo = tipo || recurso.tipo;
+
+    await recurso.save();
+
+    return res.status(200).json(recurso);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ msj: error.message });
+  }
+};
+
+//$ DELETE - Borrar recurso
+
+const deleteRecurso = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ msj: "ID no válido" });
+    }
+
+    const recurso = await Recurso.findByIdAndDelete(id);
+
+    if (!recurso) {
+      return res.status(404).json({ msj: "Recurso no encontrado" });
+    }
+
+    return res.status(200).json({ msj: "Recurso eliminado con éxito" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ msj: error.message });
+  }
+};
+
+module.exports = {
+  createRecurso,
+  getRecursos,
+  getRecursoByID,
+  updateRecurso,
+  deleteRecurso,
+};
