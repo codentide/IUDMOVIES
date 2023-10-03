@@ -1,0 +1,22 @@
+{
+	"info": {
+		"_postman_id": "f3a20d14-950e-464b-941d-546ecaef19bb",
+		"name": "IUDEV1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29688454"
+	},
+	"item": [
+		{
+			"name": "Genero",
+			"item": []
+		},
+		{
+			"name": "TEST",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}
