@@ -22,3 +22,36 @@ th {
 h2 {
   text-align: center;
 }
+
+.sectionContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  height: auto;
+  padding: 24px;
+}
+
+.moduleContainer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-row: auto;
+  gap: 10px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.cardContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-buttonBox {
+  display: flex;
+  margin: auto 0 0 0;
+
+  gap: 8px;
+  align-items: center;
+}
